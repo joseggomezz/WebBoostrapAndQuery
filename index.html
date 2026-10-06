@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Query GitHub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/css/bootstrap.min.css">
+</head>
+<body>
+<div id="mensajequery"></div>
+<div class="container">
+    <div class="input-group mb-3">
+        <input type="text" id="nombredelusuario" class="form-control" placeholder="Introduce un nombre de usuario">
+        <button id="btnbusqueda" class="btn btn-primary">Buscar</button>
+    </div>
+    <table id="tablausuario" class="table table-striped table-hover">
+        <thead class="table-dark">
+        <tr>
+            <th>Nombre</th>
+            <th>Descripcion</th>
+            <th>Seguidores</th>
+        </tr>
+        </thead>
+        <tbody id="RespuestaTabla">
+
+        </tbody>
+    </table>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#btnbusqueda').on('click', function (){
+            var username = $('#nombredelusuario').val();
+
+            // Limpiamos resultados y mensajes de la búsqueda anterior,
+            // antes de validar nada, para que la pantalla siempre arranque "limpia"
+            $('#mensajequery').html('');
+            $('#RespuestaTabla').empty();
+
+            if(username === ""){
+                $('#mensajequery').html('<div class="alert alert-warning">Por favor, introduce un nombre de usuario.</div>');
+                return;
+            }
+
+            var url = "https://api.github.com/users/" + username + "/repos";
+            $.get(url)
+                .done(function (data) {
+                    $.each(data, function (index, repo) {
+                        var descripcion = repo.description ? repo.description : 'Sin descripción';
+                        var fila = '<tr><td>' + repo.name + '</td><td>' + descripcion + '</td><td>' + repo.stargazers_count + '</td></tr>';
+                        $('#RespuestaTabla').append(fila);
+                    });
+                })
+                .fail(function () {
+                    $('#mensajequery').html('<div class="alert alert-warning">Usuario no encontrado.</div>');
+                });
+        })
+    });
+</script>
+</body>
+</html>
